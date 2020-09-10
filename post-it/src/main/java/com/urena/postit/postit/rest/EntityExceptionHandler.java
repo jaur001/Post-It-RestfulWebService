@@ -21,6 +21,7 @@ public class EntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<ExceptionResponse> handleAllException(Exception exception, WebRequest request){
+        exception.printStackTrace();
         return new ResponseEntity<>(
                 new ExceptionResponse(new Date(),exception.getMessage(),request.getDescription(false)),
                 HttpStatus.INTERNAL_SERVER_ERROR);

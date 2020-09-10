@@ -6,6 +6,7 @@ import com.urena.postit.postit.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -20,42 +21,62 @@ public class JPAUserService implements UserService{
     }
 
     @Override
+    @Transactional
     public List<User> findAll() {
         return userDao.findAll();
     }
 
     @Override
+    @Transactional
     public User findById(int id) {
         return userDao.findById(id);
     }
 
     @Override
+    @Transactional
     public User save(User user) {
         return userDao.save(user);
     }
 
     @Override
+    @Transactional
+    public User update(User user) {
+        return userDao.update(user);
+    }
+
+    @Override
+    @Transactional
     public void delete(int id) {
         userDao.delete(id);
     }
 
     @Override
-    public List<Post> findAll(int id) {
-        return userDao.findAll(id);
+    @Transactional
+    public List<Post> findAllPosts(int userId) {
+        return userDao.findAllPosts(userDao.findById(userId));
     }
 
     @Override
-    public Post findById(int userId, int postId) {
-        return userDao.findById(userId,postId);
+    @Transactional
+    public Post findPostById(int userId, int postId) {
+        return userDao.findPostById(userDao.findById(userId),postId);
     }
 
     @Override
-    public Post post(int id, Post post) {
-        return userDao.post(id,post);
+    @Transactional
+    public Post post(int userId, Post post) {
+        return userDao.post(findById(userId),post);
     }
 
     @Override
-    public void delete(int userId, int postId) {
-        userDao.delete(userId,postId);
+    @Transactional
+    public Post updatePost(int userId, Post post) {
+        return userDao.updatePost(findById(userId),post);
+    }
+
+    @Override
+    @Transactional
+    public void deletePost(int userId, int postId) {
+        userDao.deletePost(findById(userId),postId);
     }
 }

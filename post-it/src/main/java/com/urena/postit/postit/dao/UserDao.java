@@ -12,13 +12,16 @@ public interface UserDao {
 
     User save(User user);
 
+    User update(User user);
+
     void delete(int id);
 
-    List<Post> findAll(int id);
+    List<Post> findAllPosts(User user);
 
-    Post findById(int userId,int postId);
+    Post findPostById(User user,int postId);
 
-    Post post(int id, Post post);
+    Post post(User user, Post post);
+    Post updatePost(User user, Post post);
 
-    void delete(int userId, int postId);
+    void deletePost(User user, int postId);
 }

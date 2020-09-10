@@ -17,7 +17,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/post-it")
+@RequestMapping("/post-it-v1")
 public class PostItRestController {
 
     private final UserService userService;
@@ -42,7 +42,16 @@ public class PostItRestController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<Object> save(@Valid @RequestBody User user){
+    public ResponseEntity<Post> save(@Valid @RequestBody User user){
+        User savedUser = userService.save(user);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(savedUser.getId()).toUri();
+        return ResponseEntity.created(uri).build();
+    }
+
+    @PutMapping("/users")
+    public ResponseEntity<Post> update(@Valid @RequestBody User user){
         User savedUser = userService.save(user);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -57,27 +66,40 @@ public class PostItRestController {
     }
 
     @GetMapping("/users/{id}/posts")
-    public List<Post> findAll(@PathVariable int id){
-        return userService.findAll(id);
+    public List<Post> findAllPosts(@PathVariable int id){
+        return userService.findAllPosts(id);
     }
 
     @GetMapping("/users/{userId}/posts/{postId}")
-    public EntityModel<Post> findById(@PathVariable int userId,@PathVariable int postId){
-        Post post = userService.findById(userId,postId);
+    public EntityModel<Post> findPostById(@PathVariable int userId,@PathVariable int postId){
+        Post post = userService.findPostById(userId,postId);
         EntityModel<Post> entity = EntityModel.of(post);
-        WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).findAll(userId));
+        WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).findAllPosts(userId));
         entity.add(linkTo.withRel("all-posts"));
         return entity;
     }
 
-    @PostMapping("/users/{id}/posts")
-    public void post(@PathVariable int id,@Valid @RequestBody Post post){
-        userService.post(id,post);
+    @PostMapping("/users/{userId}/posts")
+    public ResponseEntity<Post> post(@PathVariable int userId,@Valid @RequestBody Post post){
+        Post savedPost = userService.post(userId,post);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(savedPost.getId()).toUri();
+        return ResponseEntity.created(uri).build();
+    }
+
+    @PutMapping("/users/{userId}/posts")
+    public ResponseEntity<Post> updatePost(@PathVariable int userId,@Valid @RequestBody Post post){
+        Post savedPost = userService.post(userId,post);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(savedPost.getId()).toUri();
+        return ResponseEntity.created(uri).build();
     }
 
     @DeleteMapping("/users/{userId}/posts/{postId}")
-    public String delete(@PathVariable int userId,@PathVariable int postId){
-        userService.delete(userId,postId);
+    public String deletePost(@PathVariable int userId,@PathVariable int postId){
+        userService.deletePost(userId,postId);
         return "Post with id " + postId + " deleted";
     }
 }

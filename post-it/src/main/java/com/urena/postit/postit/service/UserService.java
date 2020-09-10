@@ -13,13 +13,18 @@ public interface UserService {
 
     User save(User user);
 
+    User update(User user);
+
     void delete(int id);
 
-    List<Post> findAll(int id);
 
-    Post findById(int userId,int postId);
+    List<Post> findAllPosts(int userId);
 
-    Post post(int id, Post post);
+    Post findPostById(int userId, int postId);
 
-    void delete(int userId, int postId);
+    Post post(int userId, Post post);
+
+    Post updatePost(int userId, Post post);
+
+    void deletePost(int UserId, int postId);
 }

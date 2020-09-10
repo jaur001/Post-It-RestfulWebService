@@ -4,75 +4,96 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @ApiModel(description = "All details about User entity")
+@Entity
+@Table(name = "user")
 public class User {
-
-    private static final AtomicInteger idGenerator = new AtomicInteger(1);
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
     @Email
+    @Column(name = "email")
     private String email;
     @Size(min = 2, message = "User Name should have at least 2 characters")
     @ApiModelProperty(notes = "UserName choosen by the User")
+    @Column(name = "user_name")
     private String userName;
     @Size(min = 4, message = "Password should have at least 4 characters")
     @ApiModelProperty(notes = "Password written by the User")
     @JsonIgnore
+    @Column(name = "password")
     private String password;
     @Size(min = 2, message = "First Name should have at least 2 characters")
     @ApiModelProperty(notes = "First Name of the User")
+    @Column(name = "first_name")
     private String firstName;
     @Size(min = 2, message = "Last Name should have at least 2 characters")
     @ApiModelProperty(notes = "Last Name of the User")
+    @Column(name = "last_name")
     private String lastName;
     @PastOrPresent(message = "Birthdate should be in the past")
     @ApiModelProperty(notes = "Birth date of the User, it should be in the past")
+    @Column(name = "birth_date")
     private Date birthDate;
     @ApiModelProperty(notes = "Posts created by User")
+    @OneToMany(fetch=FetchType.LAZY,
+            cascade= CascadeType.ALL)
+    @JoinColumn(name="user_id")
     private List<Post> posts;
+
+    /*@ApiModelProperty(notes = "Users that the User follows")
+    @ManyToMany(fetch=FetchType.LAZY,
+            cascade= {CascadeType.PERSIST, CascadeType.MERGE,
+                    CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinTable(
+            name="following_follower",
+            joinColumns=@JoinColumn(name="following_id"),
+            inverseJoinColumns=@JoinColumn(name="follower_id"))
+    private List<User> followings;
     @ApiModelProperty(notes = "Users following the User")
-    private List<User> followers;
-    @ApiModelProperty(notes = "Users that the User follows")
-    private List<User> following;
+    @ManyToMany(fetch=FetchType.LAZY,
+            cascade= {CascadeType.PERSIST, CascadeType.MERGE,
+                    CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinTable(
+            name="following_follower",
+            joinColumns=@JoinColumn(name="follower_id"),
+            inverseJoinColumns=@JoinColumn(name="following_id"))
+    private List<User> followers;*/
 
     public User() {
-        this("","","","","",new Date());
+        posts = new ArrayList<>();
+        //following = new ArrayList<>();
+        //followers = new ArrayList<>();
     }
 
     public User(String email, String userName, String password, String firstName, String lastName, Date birthDate) {
-        this(0, email,userName,password,firstName,lastName,birthDate,new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
-    }
-
-    public User(Integer id, String email, String userName, String password, String firstName, String lastName,
-                Date birthDate, List<Post> posts, List<User> followers, List<User> following) {
-        this.id = idGenerator.getAndIncrement();
+        this();
         this.email = email;
         this.userName = userName;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthDate = birthDate;
-        this.posts = posts;
-        this.followers = followers;
-        this.following = following;
     }
-
+    /*
     public void follow(User user){
-        following.add(user);
+        followings.add(user);
         user.getFollowers().add(this);
     }
 
     public void unfollow(User user){
-        following.remove(user);
+        followings.remove(user);
         user.getFollowers().remove(this);
-    }
+    }*/
 
     public void post(Post post){
         posts.add(post);
@@ -82,9 +103,6 @@ public class User {
         posts.remove(post);
     }
 
-    public void resetId(){
-        id = idGenerator.getAndIncrement();
-    }
 
     public Integer getId() {
         return id;
@@ -149,7 +167,7 @@ public class User {
     public void setPosts(List<Post> posts) {
         this.posts = posts;
     }
-
+    /*
     public List<User> getFollowers() {
         return followers;
     }
@@ -158,11 +176,11 @@ public class User {
         this.followers = followers;
     }
 
-    public List<User> getFollowing() {
-        return following;
+    public List<User> getFollowings() {
+        return followings;
     }
 
-    public void setFollowing(List<User> following) {
-        this.following = following;
-    }
+    public void setFollowings(List<User> followings) {
+        this.followings = followings;
+    }*/
 }
